@@ -23,8 +23,9 @@ const Payment = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100vh',
-      padding: '20px'
+      minHeight: '100vh',
+      padding: '60px 20px',
+      overflowY: 'auto'
     }}>
       <div className="glass" style={{ width: '100%', maxWidth: '400px', padding: '40px', position: 'relative' }}>
         <div style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', background: 'var(--accent-pink)', padding: '10px 20px', borderRadius: '10px', fontWeight: 'bold' }}>

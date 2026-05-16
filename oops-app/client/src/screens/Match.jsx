@@ -20,9 +20,10 @@ const Match = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100vh',
-      padding: '20px',
-      textAlign: 'center'
+      minHeight: '100vh',
+      padding: '40px 20px',
+      textAlign: 'center',
+      overflowY: 'auto'
     }}>
       <motion.div
         initial={{ scale: 0 }}
@@ -37,8 +38,14 @@ const Match = () => {
       <p style={{ color: 'var(--text-dim)', marginBottom: '40px' }}>...but don't get your hopes up.</p>
 
       <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=You" style={{ width: '100px', borderRadius: '50%', border: '4px solid var(--accent-pink)', objectFit: 'cover' }} alt="You" />
-        <img src={matchedProfile.img} style={{ width: '100px', borderRadius: '50%', border: '4px solid var(--accent-purple)', objectFit: 'cover' }} alt={matchedProfile.name} />
+        <img 
+          src={localStorage.getItem('userGender') === 'girl' 
+            ? "https://api.dicebear.com/7.x/avataaars/svg?seed=GirlYou" 
+            : "https://api.dicebear.com/7.x/avataaars/svg?seed=BoyYou"} 
+          style={{ width: '100px', height: '100px', borderRadius: '50%', border: '4px solid var(--accent-pink)', objectFit: 'cover' }} 
+          alt="You" 
+        />
+        <img src={matchedProfile.img} style={{ width: '100px', height: '100px', borderRadius: '50%', border: '4px solid var(--accent-purple)', objectFit: 'cover' }} alt={matchedProfile.name} />
       </div>
 
       <div className="glass" style={{ width: '100%', maxWidth: '500px', padding: '30px', textAlign: 'left' }}>
