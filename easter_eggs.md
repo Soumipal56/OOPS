@@ -1,0 +1,59 @@
+# 🥚 The "Cursed" Easter Egg Manual: OOPS Dating App
+
+Welcome to the official documentation of everything wrong (intentionally) with **OOPS**. This app was designed to be the most hostile, cynical, and "cursed" dating experience ever built. 
+
+Here is every easter egg and toxic feature you'll find:
+
+---
+
+## 🔐 1. The "Forbidden" Login
+The login screen is your first barrier to entry. We made it as annoying as possible.
+
+*   **The Fleeing Button**: If your inputs don't meet the "cursed" criteria, the **"START JUDGING"** button will physically run away from your mouse cursor using a mathematical fleeing algorithm.
+*   **The No-'e' Rule**: You cannot use the letter 'e' (the most common letter in English) in your name. If you try, the button flees.
+*   **Weather-Locked Security**: Your password *must* contain a weather-related word (e.g., "Sunny", "Rainy", "Thunderstorm").
+*   **The Number 13**: Your password must be exactly 13 characters long. No more, no less.
+
+---
+
+## 💔 2. The "It's A Match!" Screen
+Congratulations, you matched! Now let us tell you why it won't work.
+
+*   **Failure Probability**: Every match comes with a hardcoded **98.4% Failure Probability** badge.
+*   **The Height Discrepancy**: A small caption informs you: *"They are currently talking to 14 other people who are taller than you."*
+*   **Ghosting Statistics**: The footer mentions: *"4 people are currently ghosting you"* regardless of your actual activity.
+*   **The Profile of Shame**: All profiles feature "Cursed Stats" such as:
+    *   **Last Active**: 3 years ago (even if they just messaged you).
+    *   **Response Rate**: 0.001% (Never).
+    *   **Location**: Usually "Hell" or "Your Ex's Basement".
+
+---
+
+## 💸 3. The "Pay to be Ignored" Checkout
+The payment screen is an exercise in financial disrespect.
+
+*   **Invoice #000-LO-SER**: Your official receipt number.
+*   **Cursed Fees**: You are charged for things you didn't ask for, including:
+    *   **Dave from Accounting**: $0.01 (He's having a bad week).
+    *   **Oxygen Consumption Tax**: $0.89.
+    *   **Server Maintenance (Passive-Aggressive)**: $2.50.
+*   **The Data Clause**: The footer explicitly states: *"By paying, you acknowledge that we will probably sell your data to your ex for a nickel."*
+
+---
+
+## 🤖 4. The Hostile AI Chat
+Our AI doesn't want to be here as much as you do.
+
+*   **The "K" Fallback**: If the AI is overwhelmed or bored, it has a "Panic Mode" where it will simply reply with `"k"`. 
+*   **Mood Swings**: The match's emotional state is tracked. If you are too nice, the AI becomes "Annoyed" or "Unstable."
+*   **Multilingual Toxicity**: The bot is fluent in English, Hindi, and Bengali, but it uses that fluency to be equally sarcastic in all three languages.
+*   **Typing Indicators**: The AI will show a "typing..." status for 2-5 seconds just to make you wait, even if it already knows it's going to ghost you.
+
+---
+
+## 🚩 5. The Red Flag Forecast
+The app features an API-driven "Red Flag" generator. Instead of a weather forecast, it tells you what kind of toxic behavior you can expect from your matches today (e.g., "High chance of gaslighting by 3 PM").
+
+---
+
+**Happy Swiping! (Not that it matters.)** 🥀🔥
