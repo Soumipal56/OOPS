@@ -68,5 +68,6 @@ Chatting is never peaceful. We introduced live interruptions to keep you on edge
 *   **Dodge the Red Flags**: Every message sent triggers a bullet-hell boss battle where you must dodge falling red flags with your cursor for 5 seconds for the message to be delivered safely.
 *   **Emotional Task Manager**: A retro Windows 95 task manager tracking your "Emotional RAM". If it overflows from leaks, you must manually end the emotional process.
 *   **The BSOD (Blue Screen of Rejection)**: Unmatching triggers a fake system crash error requiring a full emotional reboot.
+*   **Media Shenanigans**: The chat allows sending custom dynamic YouTube links, Pixi.js accelerated High-Fidelity GIFs (because simple `<img>` tags are for peasants), and fake "Voice Notes" that are actually Rick Rolls or loud noises in disguise.
 
 **Happy Swiping! (Not that it matters.)** 🥀🔥

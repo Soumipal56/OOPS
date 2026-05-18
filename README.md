@@ -20,13 +20,16 @@ In a world of perfect profiles and fake positivity, OOPS brings you:
 ### Frontend
 - **React + Vite**: High-performance, modern UI.
 - **Framer Motion**: For smooth (and sometimes annoying) animations.
+- **Pixi.js**: Hardware-accelerated WebGL rendering for high-fidelity GIFs.
 - **Socket.io-client**: Real-time "toxic" chat interactions.
+- **Vitest**: Blazing fast frontend unit testing.
 - **Lucide React**: Premium iconography.
 
 ### Backend
 - **Node.js + Express (v5)**: Robust API and monolithic static serving.
 - **Socket.io**: Real-time communication and typing indicators.
 - **Mongoose + MongoDB**: Persistence for the "cursed" profiles.
+- **Jest**: Comprehensive API and socket event unit testing.
 
 ### AI Engine
 - **LangChain & LangGraph**: Orchestrating complex, state-aware AI personalities.
