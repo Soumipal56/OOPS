@@ -51,9 +51,22 @@ Our AI doesn't want to be here as much as you do.
 
 ---
 
+---
+
 ## 🚩 5. The Red Flag Forecast
 The app features an API-driven "Red Flag" generator. Instead of a weather forecast, it tells you what kind of toxic behavior you can expect from your matches today (e.g., "High chance of gaslighting by 3 PM").
 
 ---
+
+## 🌪️ 6. Chaotic Interventions & Mini-Games
+Chatting is never peaceful. We introduced live interruptions to keep you on edge:
+
+*   **Friend Group Spectator Mode**: A live Twitch-style chat sidebar ("Mohalle ke log" / Group Chat) actively judges your texting speed, message length, and "Rizz" in real-time.
+*   **Homie Interruption**: If you type emotional keywords (love, miss, heart), a massive overlay pops up with your friends telling you: *"you folding over THIS?? 💀"*
+*   **Tornado Leaks**: Every 15 seconds, unread messages from *other* matches fly across the screen. If you fail to catch them, they leak into your active chat, and your current match will block you instantly.
+*   **Heart Attack Alarm**: A screaming alarm and viral video jumpscare drops every 15 seconds just to make sure you're paying attention.
+*   **Dodge the Red Flags**: Every message sent triggers a bullet-hell boss battle where you must dodge falling red flags with your cursor for 5 seconds for the message to be delivered safely.
+*   **Emotional Task Manager**: A retro Windows 95 task manager tracking your "Emotional RAM". If it overflows from leaks, you must manually end the emotional process.
+*   **The BSOD (Blue Screen of Rejection)**: Unmatching triggers a fake system crash error requiring a full emotional reboot.
 
 **Happy Swiping! (Not that it matters.)** 🥀🔥

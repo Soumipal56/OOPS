@@ -41,6 +41,9 @@ We've hidden dozens of "features" intended to annoy and amuse. Check the **[Offi
 - The "No-e" Name Rule.
 - The "Dave from Accounting" Fee.
 - AI "Panic Mode" (`k`).
+- Homie Interruption ("You folding over this?!").
+- Friend Group Spectator Mode (Twitch-style live judging).
+- Bullet-hell chat mini-games and Tornado message leaks.
 
 ---
 

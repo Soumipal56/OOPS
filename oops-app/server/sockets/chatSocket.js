@@ -21,12 +21,7 @@ const handleSocketConnection = (io) => {
     socket.on('sendMessage', async (data) => {
       const session = chatSessions[socket.id];
       
-      // Check for double texting
       const now = Date.now();
-      let isDoubleText = false;
-      if (session.lastMessageTime && (now - session.lastMessageTime < 10000) && session.messages[session.messages.length - 1]?.sender === 'me') {
-        isDoubleText = true;
-      }
       session.lastMessageTime = now;
 
       const userMessage = { content: data.text, sender: 'me', id: Date.now() };
@@ -43,11 +38,7 @@ const handleSocketConnection = (io) => {
         language: session.language
       };
 
-      if (isDoubleText) {
-         // Manual override for achievement
-         inputs.achievementUnlocked = "Double Texted";
-         inputs.attachmentLevel = Math.max(0, session.attachmentLevel - 10);
-      }
+
 
       try {
         // Simulate realistic delay for AI processing
@@ -71,9 +62,8 @@ const handleSocketConnection = (io) => {
           session.attachmentLevel = result.attachmentLevel || session.attachmentLevel;
 
           // Check achievements
-          if (result.achievementUnlocked || isDoubleText) {
-            const achievement = result.achievementUnlocked || "Double Texted";
-            socket.emit('achievement', { name: achievement });
+          if (result.achievementUnlocked) {
+            socket.emit('achievement', { name: result.achievementUnlocked });
           }
 
           // Check toxic events
