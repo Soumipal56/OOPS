@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --testPathPatterns=tests/ --forceExit",
     "test:watch": "jest --testPathPatterns=tests/ --watchAll",
-    "dev": "npx nodemon index.js"
+    "dev": "npx nodemon index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",

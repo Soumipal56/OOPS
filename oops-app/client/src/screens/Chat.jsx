@@ -3,6 +3,61 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, MoreVertical, Shield, AlertTriangle, LogOut, Heart, Volume2, Wind } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
+import { Application, Assets } from 'pixi.js';
+import '@pixi/gif';
+
+const PixiGif = ({ url, alt }) => {
+  const containerRef = useRef(null);
+  const appRef = useRef(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    let gifSprite = null;
+
+    const initPixi = async () => {
+      try {
+        const app = new Application();
+        await app.init({ width: 250, height: 200, backgroundAlpha: 0 });
+        if (!isMounted) {
+          app.destroy({ removeView: true, children: true });
+          return;
+        }
+        appRef.current = app;
+        if (containerRef.current) {
+          containerRef.current.appendChild(app.canvas);
+        }
+
+        const loadedGif = await Assets.load(url);
+        if (!isMounted) return;
+
+        gifSprite = loadedGif.clone();
+        const scale = Math.min(250 / gifSprite.width, 200 / gifSprite.height);
+        gifSprite.scale.set(scale);
+        gifSprite.x = (250 - gifSprite.width * scale) / 2;
+        gifSprite.y = (200 - gifSprite.height * scale) / 2;
+
+        app.stage.addChild(gifSprite);
+      } catch (err) {
+        console.error("Failed to load Pixi GIF:", err);
+      }
+    };
+
+    initPixi();
+
+    return () => {
+      isMounted = false;
+      if (gifSprite) {
+        gifSprite.destroy();
+      }
+      if (appRef.current) {
+        appRef.current.destroy({ removeView: true, children: true });
+        appRef.current = null;
+      }
+    };
+  }, [url]);
+
+  return <div ref={containerRef} style={{ width: '100%', maxWidth: '250px', borderRadius: '10px', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }} title={alt} />;
+};
 
 const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
@@ -576,9 +631,40 @@ const [blockedMatches, setBlockedMatches] = useState({});
     return () => clearInterval(timer);
   }, [matches]);
 
+  // Fake Voice Note trap simulator - comes automatically after 20 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      triggerFakeVoiceNote();
+    }, 20000);
+
+    return () => clearInterval(timer);
+  }, [matches, activeMatch]);
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistories, typingStatus, activeMatch]);
+
+  const triggerFakeVoiceNote = () => {
+    if (!activeMatch) return;
+    
+    // Don't send multiple to the same person
+    if (chatHistories[activeMatch.name]?.some(m => m.text.includes('[VOICE_NOTE]'))) return;
+
+    const names = ['Alex', 'Jordan', 'Taylor', 'Sam', 'Chris', 'Riley'];
+    const fakeName = names[Math.floor(Math.random() * names.length)];
+
+    const voiceMsg = {
+      id: Date.now() + Math.random(),
+      text: `🎤 [VOICE_NOTE] ${fakeName}`,
+      sender: 'them',
+      time: 'Just now'
+    };
+
+    setChatHistories(prev => ({
+      ...prev,
+      [activeMatch.name]: [...(prev[activeMatch.name] || []), voiceMsg]
+    }));
+  };
 
   const triggerTornadoMessage = () => {
     if (matches.length <= 1) return;
@@ -997,7 +1083,20 @@ const [blockedMatches, setBlockedMatches] = useState({});
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '15px', position: 'relative' }}>
+              <div style={{ display: 'flex', gap: '15px', position: 'relative', alignItems: 'center' }}>
+                  <button 
+                    onClick={() => {
+                      toast.error("📹 Call declined! They saw you through the front camera and panicked.");
+                      setChatHistories(prev => ({
+                        ...prev,
+                        [activeMatch.name]: [...(prev[activeMatch.name] || []), { id: Date.now(), text: "📹 Missed video call. Please never do that again.", sender: 'them', time: 'Just now' }]
+                      }));
+                    }} 
+                    style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', padding: 0 }}
+                    title="Video Call"
+                  >
+                    📹
+                  </button>
                   <LogOut color="var(--accent-pink)" style={{ cursor: 'pointer' }} onClick={() => setShowExitPopup(true)} />
                   <MoreVertical color="var(--text-dim)" style={{ cursor: 'pointer' }} onClick={() => setShowMenu(!showMenu)} />
                   
@@ -1166,6 +1265,77 @@ const [blockedMatches, setBlockedMatches] = useState({});
                     </div>
                   );
                 };
+
+                const isVoiceNote = m.text.includes('[VOICE_NOTE]');
+                if (isVoiceNote) {
+                  const wrongName = m.text.split(' ')[2] || 'Alex';
+                  return (
+                    <div key={m.id} style={{ display: 'flex', flexDirection: 'column', alignSelf: 'flex-start', margin: '14px 0' }}>
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        style={{
+                          padding: '12px 18px',
+                          borderRadius: '20px 20px 20px 0',
+                          background: 'var(--glass-bg)',
+                          border: '1px solid var(--glass-border)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}
+                      >
+                        <button 
+                          onClick={() => {
+                            const utterance = new SpeechSynthesisUtterance(`I love you, ${wrongName}`);
+                            // Pitch variation for fun
+                            utterance.pitch = Math.random() * 0.5 + 0.8;
+                            window.speechSynthesis.speak(utterance);
+                            toast.error(`Wait... who is ${wrongName}?! 💀`);
+                            
+                            // Delete it after 3 seconds
+                            setTimeout(() => {
+                              setChatHistories(prev => {
+                                const current = prev[activeMatch.name] || [];
+                                return { ...prev, [activeMatch.name]: current.filter(msg => msg.id !== m.id) };
+                              });
+                              
+                              // Send apology
+                              const oopsMsg = {
+                                id: Date.now(),
+                                text: "OMG sorry wrong chat!! That was by mistake 😭 please ignore",
+                                sender: 'them',
+                                time: 'Just now'
+                              };
+                              setChatHistories(prev => ({
+                                ...prev,
+                                [activeMatch.name]: [...(prev[activeMatch.name] || []), oopsMsg]
+                              }));
+                            }, 3000);
+                          }}
+                          style={{
+                            background: 'var(--accent-pink)',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '40px',
+                            height: '40px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            color: 'white',
+                            fontSize: '1.2rem'
+                          }}
+                        >
+                          ▶️
+                        </button>
+                        <div>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Voice Message</div>
+                          <div style={{ fontSize: '0.7rem', color: '#888' }}>0:02</div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  );
+                }
 
                 if (isSpecial) {
                   let cardBg = 'linear-gradient(135deg, rgba(255, 45, 85, 0.25), rgba(255, 100, 130, 0.1))';
@@ -1353,7 +1523,14 @@ const [blockedMatches, setBlockedMatches] = useState({});
                         position: 'relative'
                       }}
                     >
-                      <p style={{ fontSize: '0.9rem', margin: 0 }}>{m.text}</p>
+                      {m.gifUrl ? (
+                        <div style={{ marginTop: '5px' }}>
+                          <PixiGif url={m.gifUrl} alt="GIF" />
+                          <p style={{ fontSize: '0.75rem', fontStyle: 'italic', margin: '5px 0 0', opacity: 0.8 }}>{m.text}</p>
+                        </div>
+                      ) : (
+                        <p style={{ fontSize: '0.9rem', margin: 0 }}>{m.text}</p>
+                      )}
                       <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: '5px', textAlign: 'right' }}>
                         {m.time}
                       </span>
@@ -1506,34 +1683,77 @@ const [blockedMatches, setBlockedMatches] = useState({});
                     </div>
                   ))}
 
-                  {/* Input form to support custom pasting dynamic video urls! */}
-                  <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
-                    <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>
-                      🔗 Paste custom YouTube link or video ID:
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input 
-                        type="text"
-                        value={customYoutubeUrl}
-                        onChange={e => setCustomYoutubeUrl(e.target.value)}
-                        placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                        style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'white', fontSize: '0.8rem' }}
-                      />
-                      <button 
-                        onClick={() => {
-                          if (!customYoutubeUrl.trim()) {
-                            toast.error("Please enter a valid YouTube link or Video ID first!");
-                            return;
-                          }
-                          const videoId = getYoutubeId(customYoutubeUrl);
-                          sendMediaMessage('custom', videoId, 'Custom YouTube Share', 'Shared by custom link');
-                        }}
-                        style={{ padding: '0 16px', borderRadius: '10px', background: 'var(--accent-pink)', border: 'none', color: 'white', fontWeight: 'bold', fontSize: '0.8rem', cursor: 'pointer' }}
-                      >
-                        Send Video
-                      </button>
+                  {showMediaSelector === 'gif' && [
+                    { id: 'rickroll', title: 'Rick Astley Dance', url: 'https://media.giphy.com/media/Ju7l5y9osyymQ/giphy.gif' },
+                    { id: 'crying', title: 'Melting Crying Emoji', url: 'https://media.giphy.com/media/2rtQMJvhzOnRe/giphy.gif' },
+                    { id: 'clown', title: 'Putting on Clown Makeup', url: 'https://media.giphy.com/media/x0npYExCGOZeo/giphy.gif' },
+                    { id: 'mindblown', title: 'Mind Blown', url: 'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif' },
+                    { id: 'facepalm', title: 'Facepalm', url: 'https://media.giphy.com/media/3og0INyCmHlNylks9O/giphy.gif' },
+                    { id: 'popcorn', title: 'Eating Popcorn', url: 'https://media.giphy.com/media/tFK8urY6XHj2w/giphy.gif' },
+                    { id: 'thisisfine', title: 'This Is Fine', url: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif' },
+                    { id: 'laughing', title: 'Hysterically Laughing', url: 'https://media.giphy.com/media/10JhviFuU2gWD6/giphy.gif' },
+                    { id: 'confused', title: 'Confused Math', url: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif' },
+                    { id: 'waiting', title: 'Waiting Skeleton', url: 'https://media.giphy.com/media/l2JhtKtDWYNKdRpoA/giphy.gif' }
+                  ].map(v => (
+                    <div 
+                      key={v.id}
+                      onClick={() => {
+                        const newMsg = {
+                          id: Date.now() + Math.random(),
+                          text: `[GIF] ${v.title}`,
+                          gifUrl: v.url,
+                          sender: 'me',
+                          time: 'Just now'
+                        };
+                        setChatHistories(prev => ({
+                          ...prev,
+                          [activeMatch.name]: [...(prev[activeMatch.name] || []), newMsg]
+                        }));
+                        setShowMediaSelector(false);
+                        toast.success(`GIF sent to ${activeMatch.name}!`);
+                      }}
+                      style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(168, 85, 247, 0.12)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img src={v.url} style={{ width: '40px', height: '40px', borderRadius: '5px', objectFit: 'cover' }} alt={v.title} />
+                        <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{v.title}</div>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: '#a855f7' }}>Send GIF →</span>
                     </div>
-                  </div>
+                  ))}
+
+                  {/* Input form to support custom pasting dynamic video urls! */}
+                  {showMediaSelector === 'custom' && (
+                    <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
+                      <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px' }}>
+                        🔗 Paste custom YouTube link or video ID:
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input 
+                          type="text"
+                          value={customYoutubeUrl}
+                          onChange={e => setCustomYoutubeUrl(e.target.value)}
+                          placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                          style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'white', fontSize: '0.8rem' }}
+                        />
+                        <button 
+                          onClick={() => {
+                            if (!customYoutubeUrl.trim()) {
+                              toast.error("Please enter a valid YouTube link or Video ID first!");
+                              return;
+                            }
+                            const videoId = getYoutubeId(customYoutubeUrl);
+                            sendMediaMessage('custom', videoId, 'Custom YouTube Share', 'Shared by custom link');
+                          }}
+                          style={{ padding: '0 16px', borderRadius: '10px', background: 'var(--accent-pink)', border: 'none', color: 'white', fontWeight: 'bold', fontSize: '0.8rem', cursor: 'pointer' }}
+                        >
+                          Send Video
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -1647,6 +1867,33 @@ const [blockedMatches, setBlockedMatches] = useState({});
                     style={{ background: 'none', border: 'none', color: 'white', width: '100%', padding: '10px 0', outline: 'none' }}
                   />
                 </div>
+                
+                <button 
+                  type="button" 
+                  onClick={() => setShowMediaSelector(showMediaSelector === 'gif' ? false : 'gif')} 
+                  style={{ background: showMediaSelector === 'gif' ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255,255,255,0.05)', border: showMediaSelector === 'gif' ? '1px solid #a855f7' : '1px solid var(--glass-border)', borderRadius: '15px', padding: '0 15px', height: '50px', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                  title="Select GIF"
+                >
+                  GIF
+                </button>
+
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    toast.error("🎙️ Microphone accessed... Sending your heavy breathing.");
+                    setTimeout(() => {
+                      setChatHistories(prev => ({
+                        ...prev,
+                        [activeMatch.name]: [...(prev[activeMatch.name] || []), { id: Date.now(), text: "🎤 [Audio: Heavy breathing for 4 seconds]", sender: 'me', time: 'Just now' }]
+                      }));
+                    }, 1000);
+                  }} 
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', cursor: 'pointer' }}
+                  title="Send Voice Note"
+                >
+                  🎙️
+                </button>
+
                 <button type="submit" className="btn-premium" style={{ background: themeColor, borderRadius: '50%', width: '50px', height: '50px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Send size={20} />
                 </button>
