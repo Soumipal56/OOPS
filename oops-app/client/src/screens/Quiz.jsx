@@ -45,7 +45,13 @@ const Quiz = () => {
     }
   ];
 
+  const playKehnaSound = () => {
+    const audio = new Audio('/sounds/kehna_kya_chahte_ho.mp3');
+    audio.play().catch(e => console.error("Failed to play dialogue sound:", e));
+  };
+
   const handleNext = () => {
+    playKehnaSound();
     if (step < questions.length - 1) {
       setStep(step + 1);
     } else {

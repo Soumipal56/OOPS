@@ -41,24 +41,31 @@ The payment screen is an exercise in financial disrespect.
 
 ---
 
-## 🤖 4. The Hostile AI Chat
+## 🎬 4. Cinematic Hindi Meme Soundtracks
+The dating interface uses actual iconic Hindi dialogues from famous movies to judge and humiliate your life choices:
+
+*   **"Ye koi tareeka hai bheek maangne ka"** 🥺: The legendary dialogue from *Hera Pheri* triggers with custom audio playback when the user desperately clicks **"Enter Chat Anyway"** on the match screen after multiple glitch cutscenes.
+*   **"System phadd denge"** 💥: The high-intensity audio dialogue blasts at full volume when you get matched, block-crashed, or trigger a full Blue Screen of Rejection (BSOD).
+*   **"Arey, kehna kya chahte ho?"** 🤔: The famous *3 Idiots* professor dialogue plays in high-fidelity MP3 every single time you click a multiple-choice option/answer button during the series of dating onboarding questions in the Quiz!
+
+---
+
+## 🤖 5. The Hostile AI Chat
 Our AI doesn't want to be here as much as you do.
 
 *   **The "K" Fallback**: If the AI is overwhelmed or bored, it has a "Panic Mode" where it will simply reply with `"k"`. 
 *   **Mood Swings**: The match's emotional state is tracked. If you are too nice, the AI becomes "Annoyed" or "Unstable."
-*   **Multilingual Toxicity**: The bot is fluent in English, Hindi, and Bengali, but it uses that fluency to be equally sarcastic in all three languages.
+*   **Multilingual Sarcasm**: The bot is fluent in English, Hindi, and Bengali, but it uses that fluency to be equally sarcastic in all three languages.
 *   **Typing Indicators**: The AI will show a "typing..." status for 2-5 seconds just to make you wait, even if it already knows it's going to ghost you.
 
 ---
 
----
-
-## 🚩 5. The Red Flag Forecast
+## 🚩 6. The Red Flag Forecast
 The app features an API-driven "Red Flag" generator. Instead of a weather forecast, it tells you what kind of toxic behavior you can expect from your matches today (e.g., "High chance of gaslighting by 3 PM").
 
 ---
 
-## 🌪️ 6. Chaotic Interventions & Mini-Games
+## 🌪️ 7. Chaotic Interventions & Mini-Games
 Chatting is never peaceful. We introduced live interruptions to keep you on edge:
 
 *   **Friend Group Spectator Mode**: A live Twitch-style chat sidebar ("Mohalle ke log" / Group Chat) actively judges your texting speed, message length, and "Rizz" in real-time.

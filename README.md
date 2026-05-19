@@ -12,6 +12,10 @@ In a world of perfect profiles and fake positivity, OOPS brings you:
 - **Cursed Validation**: Passwords that must be exactly 13 characters and mention the weather.
 - **Cynical AI**: A match that is programmed to be unimpressed by your opening line.
 - **Real Stats**: Failure probabilities, ghosting timers, and "Oxygen Consumption Taxes."
+- **Cinematic Hindi Meme Audio Integration**: Uses actual dialogues from famous movies (e.g. *3 Idiots*, *Hera Pheri*) to judge and talk to the user in real-time, such as:
+  - `"Arey kehna kya chahte ho"` on quiz option clicks.
+  - `"Ye koi tareeka hai bheek maangne ka"` on desperation entry clicks.
+  - `"System phadd denge"` on system crash reboots.
 
 ---
 
@@ -34,7 +38,7 @@ In a world of perfect profiles and fake positivity, OOPS brings you:
 ### AI Engine
 - **LangChain & LangGraph**: Orchestrating complex, state-aware AI personalities.
 - **Mistral AI**: Powering the sarcastic and witty responses.
-- **Bengali/Hindi Support**: Multi-lingual toxicity.
+- **Bengali/Hindi/English Support**: Multi-lingual toxicity.
 
 ---
 
@@ -47,6 +51,7 @@ We've hidden dozens of "features" intended to annoy and amuse. Check the **[Offi
 - Homie Interruption ("You folding over this?!").
 - Friend Group Spectator Mode (Twitch-style live judging).
 - Bullet-hell chat mini-games and Tornado message leaks.
+- Legendary Cinematic Dialogue Soundbytes.
 
 ---
 

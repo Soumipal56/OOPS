@@ -36,7 +36,17 @@ const Swipe = () => {
   const [multiplyingPopups, setMultiplyingPopups] = useState([]);
   const [swipeCount, setSwipeCount] = useState(0);
   const [showLonelinessPopup, setShowLonelinessPopup] = useState(false);
+  const [unsuccessfulLikes, setUnsuccessfulLikes] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setProfiles(getProfiles());
+  }, []);
+
+  useEffect(() => {
+    setUnsuccessfulLikes(0);
+    setLikeBtnOffset({ x: 0, y: 0 });
+  }, [currentIndex]);
 
   const panicMessages = [
     "HURRY! YOUR BIOLOGICAL CLOCK IS TICKING LOUDER THAN A BOMB.",
@@ -362,6 +372,18 @@ const Swipe = () => {
     incrementSwipes();
     if (isCracked || isSlipping || qteActive) return;
 
+    if (unsuccessfulLikes >= 3) {
+      const matched = profiles[currentIndex];
+      localStorage.setItem('matchedProfile', JSON.stringify({ name: matched.name, img: matched.img, age: matched.age, bio: matched.bio }));
+      toast.success(`🎯 MATCH SECURED! You successfully selected ${matched.name}!`);
+      setTimeout(() => {
+        navigate('/match');
+      }, 800);
+      return;
+    }
+
+    setUnsuccessfulLikes(prev => prev + 1);
+
     // 50% chance of soap card slip
     if (Math.random() < 0.5) {
       setIsSlipping(true);
@@ -380,10 +402,17 @@ const Swipe = () => {
   };
 
   const runAway = () => {
+    if (unsuccessfulLikes >= 3) {
+      return;
+    }
     const newX = (Math.random() - 0.5) * 360;
     const newY = (Math.random() - 0.5) * 260;
     setLikeBtnOffset({ x: newX, y: newY });
-    toast.warn("🧼 OOPS! The Like button slipped like wet soap! Try to catch it!");
+    setUnsuccessfulLikes(prev => {
+      const next = prev + 1;
+      toast.warn(`🧼 OOPS! The Like button slipped like wet soap! Try to catch it! (Attempt ${next}/3)`);
+      return next;
+    });
   };
 
   const spawnMultiplyingPopups = () => {

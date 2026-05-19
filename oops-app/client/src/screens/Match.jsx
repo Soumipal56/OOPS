@@ -128,6 +128,17 @@ const Match = () => {
     }
   };
 
+  const playBheekMaangneKaSound = () => {
+    try {
+      const audio = new Audio('/sounds/bheek_maangne_ka.mp3');
+      audio.play().catch(e => {
+        console.error("Failed to play local MP3 sound:", e);
+      });
+    } catch (e) {
+      console.error("Failed to play bheek maangne ka sound", e);
+    }
+  };
+
   return (
     <div className="match-screen" style={{
       display: 'flex',
@@ -394,8 +405,11 @@ const Match = () => {
                   boxShadow: '0 0 15px rgba(16, 185, 129, 0.4)'
                 }}
                 onClick={() => {
+                  playBheekMaangneKaSound();
                   toast.warn("🔒 Firewall bypassed. Entering chat with active warnings...");
-                  navigate('/chat');
+                  setTimeout(() => {
+                    navigate('/chat');
+                  }, 2000);
                 }}
               >
                 💬 ENTER CHAT ANYWAY (BYPASS MELTDOWN)

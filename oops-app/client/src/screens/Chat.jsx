@@ -427,16 +427,35 @@ const [blockedMatches, setBlockedMatches] = useState({});
     }
   };
 
+  const playPhaddDengeSound = () => {
+    try {
+      const audio = new Audio('/sounds/system_phaad_denge.mp3');
+      audio.play().catch(e => {
+        console.error("Failed to play local MP3 sound:", e);
+      });
+    } catch (e) {
+      console.error("Failed to play speaker tearing sound", e);
+    }
+  };
+
   const triggerBSOD = () => {
     setShowBSOD(true);
     setBsodPercentage(0);
+    playPhaddDengeSound();
     const interval = setInterval(() => {
       setBsodPercentage(prev => {
-        if (prev >= 100) {
+        const next = prev + Math.floor(Math.random() * 8) + 3;
+        if (next >= 100) {
           clearInterval(interval);
+          setTimeout(() => {
+            setShowBSOD(false);
+            setBlockedMatches({});
+            setFakeRam(12);
+            toast.success("💓 System rebooted! Heart rate stabilized.");
+          }, 1200);
           return 100;
         }
-        return prev + Math.floor(Math.random() * 8) + 3;
+        return next;
       });
     }, 200);
   };
@@ -471,7 +490,12 @@ const [blockedMatches, setBlockedMatches] = useState({});
 
   // Setup matches list and unique histories
   useEffect(() => {
-    let list = [...defaultMatches];
+    const userGender = localStorage.getItem('userGender') || 'boy';
+    const filteredDefaults = defaultMatches.filter(m => {
+      const isGirl = ['Stacy', 'Becky', 'Karen'].includes(m.name);
+      return userGender === 'boy' ? isGirl : !isGirl;
+    });
+    let list = [...filteredDefaults];
     const stored = localStorage.getItem('matchedProfile');
     if (stored) {
       const profile = JSON.parse(stored);
@@ -479,7 +503,7 @@ const [blockedMatches, setBlockedMatches] = useState({});
       list.unshift(profile);
     }
     setMatches(list);
-    setActiveMatch(list[0]);
+    setActiveMatch(list[0] || null);
 
     // Get current user custom profile
     const userProfile = JSON.parse(localStorage.getItem('userProfile')) || { name: 'Dan', bio: 'Just swiping to feel something.' };
@@ -530,12 +554,11 @@ const [blockedMatches, setBlockedMatches] = useState({});
     };
   }, [activeMatch]);
 
-  // Tornado physics update loop
+  // Tornado physics update loop (pure positions update!)
   useEffect(() => {
     const loop = setInterval(() => {
-      const now = Date.now();
       setFlyingMessages(prev => {
-        const updated = prev.map(m => {
+        return prev.map(m => {
           let newRadius = m.radius - 1.2; // pull closer to center slower
           if (newRadius < 40) {
             newRadius = 500; // loop back to outer edge if not caught
@@ -547,71 +570,71 @@ const [blockedMatches, setBlockedMatches] = useState({});
             scale: 0.4 + (newRadius / 500) * 0.6
           };
         });
-
-        // Filter out expired (10 seconds limit)
-        const expired = updated.filter(m => now - m.createdAt >= 10000);
-        if (expired.length > 0) {
-          expired.forEach(m => {
-            playWindDissolveSound();
-
-            // Each unread message eats fake RAM
-            setFakeRam(prev => {
-              const next = Math.min(100, prev + 15);
-              if (next >= 75) {
-                setShowTaskManager(true);
-              }
-              return next;
-            });
-            
-            // If the user is currently chatting with someone, leak the message into the active chat log!
-            if (activeMatch) {
-              const leakedText = `🚨 [TORNADO LEAK] ${m.senderName}: "${m.text}"`;
-              const leakedMsg = {
-                id: Date.now() + Math.random(),
-                text: leakedText,
-                sender: 'them',
-                time: 'Just now'
-              };
-              
-              setChatHistories(prevHistory => ({
-                ...prevHistory,
-                [activeMatch.name]: [...(prevHistory[activeMatch.name] || []), leakedMsg]
-              }));
-
-              // Trigger the deep-white theme since Chad/Becky's text leaked into active chat!
-              triggerDeepWhite();
-
-              // The active partner blocks you for receiving texts from other matches!
-              const partnerToBlock = activeMatch.name;
-              setTimeout(() => {
-                setBlockedMatches(prev => ({ ...prev, [partnerToBlock]: true }));
-                toast.error(`❌ BLOCKED: ${partnerToBlock} blocked you because she saw you receiving messages from other people!`);
-                
-                // Trigger the FULL fake Blue Screen of Rejection crash!
-                setTimeout(() => {
-                  triggerBSOD();
-                }, 1500);
-              }, 1500);
-
-              toast.error(
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontWeight: 'bold' }}>🚨 TORNADO LEAK!</span>
-                  <span>You failed to catch ${m.senderName}'s message! It got sucked into your active chat with ${activeMatch.name}!</span>
-                </div>,
-                { autoClose: 6000 }
-              );
-            } else {
-              toast.error(`💨 GONE! ${m.senderName}'s message blew away in the tornado!`);
-            }
-          });
-        }
-
-        return updated.filter(m => now - m.createdAt < 10000);
       });
     }, 30);
 
     return () => clearInterval(loop);
-  }, [activeMatch]);
+  }, []);
+
+  // Monitor flyingMessages for expired messages and trigger side-effects cleanly!
+  useEffect(() => {
+    const now = Date.now();
+    const expired = flyingMessages.filter(m => now - m.createdAt >= 10000);
+    if (expired.length > 0) {
+      // 1. Remove expired messages from state
+      setFlyingMessages(prev => prev.filter(m => now - m.createdAt < 10000));
+
+      // 2. Perform all side-effects and dependent state updates safely outside render flow
+      expired.forEach(m => {
+        playWindDissolveSound();
+
+        setFakeRam(prev => {
+          const next = Math.min(100, prev + 15);
+          if (next >= 75) {
+            setShowTaskManager(true);
+          }
+          return next;
+        });
+
+        if (activeMatch) {
+          const leakedText = `🚨 [TORNADO LEAK] ${m.senderName}: "${m.text}"`;
+          const leakedMsg = {
+            id: Date.now() + Math.random(),
+            text: leakedText,
+            sender: 'them',
+            time: 'Just now'
+          };
+
+          setChatHistories(prevHistory => ({
+            ...prevHistory,
+            [activeMatch.name]: [...(prevHistory[activeMatch.name] || []), leakedMsg]
+          }));
+
+          triggerDeepWhite();
+
+          const partnerToBlock = activeMatch.name;
+          setTimeout(() => {
+            setBlockedMatches(prev => ({ ...prev, [partnerToBlock]: true }));
+            toast.error(`❌ BLOCKED: ${partnerToBlock} blocked you because she saw you receiving messages from other people!`);
+
+            setTimeout(() => {
+              triggerBSOD();
+            }, 1500);
+          }, 1500);
+
+          toast.error(
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontWeight: 'bold' }}>🚨 TORNADO LEAK!</span>
+              <span>You failed to catch ${m.senderName}'s message! It got sucked into your active chat with ${activeMatch.name}!</span>
+            </div>,
+            { autoClose: 6000 }
+          );
+        } else {
+          toast.error(`💨 GONE! ${m.senderName}'s message blew away in the tornado!`);
+        }
+      });
+    }
+  }, [flyingMessages, activeMatch]);
 
   // Background flying messages simulator - comes once every 15 seconds (15000ms)
   useEffect(() => {
@@ -704,7 +727,7 @@ const [blockedMatches, setBlockedMatches] = useState({});
     setFlyingMessages(prev => [...prev, newFlying]);
   };
 
-  // Dodge the Red Flags game loop engine
+  // Dodge the Red Flags game loop engine (pure movement ticks!)
   useEffect(() => {
     if (!bossActive) return;
 
@@ -721,52 +744,56 @@ const [blockedMatches, setBlockedMatches] = useState({});
     }, 380);
 
     let gameInterval = setInterval(() => {
-      // Update bullets
+      // Update bullets positions (pure updater!)
       setBullets(prev => {
         const moved = prev.map(b => ({ ...b, y: b.y + b.speed }));
-        // Collision check
-        const hit = moved.some(b => b.y >= 240 && b.y <= 275 && Math.abs(b.x - playerX) < 22);
-        if (hit) {
-          toast.error("💥 TOXIC COLLISION! You hit a red flag! Reseting timer...");
-          setBossTimer(5.0);
-          return [];
-        }
         return moved.filter(b => b.y < 310);
       });
 
-      // Decrease timer
-      setBossTimer(prev => {
-        const next = Math.max(0, prev - 0.05);
-        if (next <= 0) {
-          clearInterval(spawnInterval);
-          clearInterval(gameInterval);
-          setBossActive(false);
-          
-          if (pendingMessage) {
-            setChatHistories(prevHist => ({
-              ...prevHist,
-              [activeMatch.name]: [...(prevHist[activeMatch.name] || []), pendingMessage]
-            }));
-            socket.emit('sendMessage', { text: pendingMessage.text, language });
-            addTwitchComment(pendingMessage.text, 'user');
-            
-            // Random ex-spams
-            const randomExMessage = exMessages[Math.floor(Math.random() * exMessages.length)];
-            setShowExPopup(randomExMessage);
-            setTimeout(() => setShowExPopup(''), 4000);
-          }
-          
-          toast.success("🏆 TOXICITY SURVIVED! Message delivered safely!");
-        }
-        return next;
-      });
+      // Decrease timer (pure updater!)
+      setBossTimer(prev => Math.max(0, prev - 0.05));
     }, 50);
 
     return () => {
       clearInterval(spawnInterval);
       clearInterval(gameInterval);
     };
-  }, [bossActive, playerX, pendingMessage]);
+  }, [bossActive]);
+
+  // Monitor bullets for collisions cleanly in useEffect!
+  useEffect(() => {
+    if (!bossActive) return;
+    const hit = bullets.some(b => b.y >= 240 && b.y <= 275 && Math.abs(b.x - playerX) < 22);
+    if (hit) {
+      toast.error("💥 TOXIC COLLISION! You hit a red flag! Reseting timer...");
+      setBossTimer(5.0);
+      setBullets([]);
+    }
+  }, [bullets, playerX, bossActive]);
+
+  // Monitor bossTimer for win condition cleanly in useEffect!
+  useEffect(() => {
+    if (bossActive && bossTimer <= 0) {
+      setBossActive(false);
+      setBullets([]);
+
+      if (pendingMessage) {
+        setChatHistories(prevHist => ({
+          ...prevHist,
+          [activeMatch.name]: [...(prevHist[activeMatch.name] || []), pendingMessage]
+        }));
+        socket.emit('sendMessage', { text: pendingMessage.text, language });
+        addTwitchComment(pendingMessage.text, 'user');
+
+        // Random ex-spams
+        const randomExMessage = exMessages[Math.floor(Math.random() * exMessages.length)];
+        setShowExPopup(randomExMessage);
+        setTimeout(() => setShowExPopup(''), 4000);
+      }
+
+      toast.success("🏆 TOXICITY SURVIVED! Message delivered safely!");
+    }
+  }, [bossTimer, bossActive, pendingMessage, activeMatch, language]);
 
   const triggerHeartAttack = () => {
     if (matches.length === 0) return;
